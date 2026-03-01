@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+.git/
+*.md
+*.user
+*.suo
+*.log
+TestResults/
+.idea/
+*.sln.iml
+.DS_Store
+Thumbs.db
+build/
+Build/
