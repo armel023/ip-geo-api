@@ -1,3 +1,4 @@
+using IpGeoApi.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,8 +10,12 @@ public class AppDbContext : IdentityDbContext
     {
     }
 
+    public DbSet<History> Histories { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.Entity<History>()
+            .HasIndex(h => new { h.CreatedAt, h.Ip });
     }
 }
