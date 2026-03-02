@@ -1,11 +1,25 @@
 using IpGeoApi.Data;
 using IpGeoApi.Repositories;
 using IpGeoApi.Services;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpLogging(logging =>
+{
+    logging.LoggingFields = HttpLoggingFields.All;
+
+    logging.RequestHeaders.Add("User-Agent");
+    logging.RequestHeaders.Add("Content-Type");
+
+    logging.ResponseHeaders.Add("Content-Type");
+
+    logging.RequestBodyLogLimit = 4096;
+    logging.ResponseBodyLogLimit = 4096;
+});
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -70,7 +84,7 @@ using (var scope = app.Services.CreateScope())
 
     await DbSeeder.SeedUsersAsync(services);
 }
-
+app.UseHttpLogging();
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
 // {
