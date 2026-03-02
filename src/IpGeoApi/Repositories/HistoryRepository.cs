@@ -52,9 +52,9 @@ public class HistoryRepository : IHistoryRepository
         }
         if (!string.IsNullOrEmpty(sortBy))
         {
-            if (sortBy.ToLower() == "ip")
-                query = desc ? query.OrderByDescending(h => h.Ip) : query.OrderBy(h => h.Ip);
-            else
+            // if (sortBy.ToLower() == "ip")
+            //     query = desc ? query.OrderByDescending(h => h.Ip) : query.OrderBy(h => h.Ip);
+            // else
                 query = desc ? query.OrderByDescending(h => h.CreatedAt) : query.OrderBy(h => h.CreatedAt);
         }
         else
