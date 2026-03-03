@@ -9,11 +9,13 @@ public class IpInfoService
 {
     private readonly IHttpClientFactory _clientFactory;
     private readonly string _token;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public IpInfoService(IHttpClientFactory clientFactory, IConfiguration config)
+    public IpInfoService(IHttpClientFactory clientFactory, IConfiguration config, IHttpContextAccessor httpContextAccessor)
     {
         _clientFactory = clientFactory;
         _token = Environment.GetEnvironmentVariable("IpGeoToken") ?? config["IpGeoToken"] ?? string.Empty;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<IpInfoResponse?> GetIpInfoAsync(string ip)
@@ -30,9 +32,15 @@ public class IpInfoService
 
     public async Task<IpInfoResponse?> GetIpInfoMeAsync()
     {
+        
         var client = _clientFactory.CreateClient("IpInfo");
         var request = new HttpRequestMessage(HttpMethod.Get, "/");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+        request.Headers.Add("X-Forwarded-For", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        request.Headers.Add("X-Real-IP", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        request.Headers.Add("X-Client-IP", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        request.Headers.Add("X-Forwarded", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        
         var response = await client.SendAsync(request);
         if (!response.IsSuccessStatusCode)
             return null;

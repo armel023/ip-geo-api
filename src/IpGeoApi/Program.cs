@@ -57,6 +57,7 @@ builder.Services.AddAuthentication()
         };
     });
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(IpGeoApi.Utilities.MappingProfile));
 builder.Services.AddScoped<AuthenticationService>();
