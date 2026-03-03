@@ -10,12 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpLogging(logging =>
 {
-    logging.LoggingFields = HttpLoggingFields.All;
+    logging.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestHeaders;
 
     logging.RequestHeaders.Add("User-Agent");
     logging.RequestHeaders.Add("Content-Type");
-
-    logging.ResponseHeaders.Add("Content-Type");
+    logging.RequestHeaders.Add("X-Forwarded-For");
+    logging.RequestHeaders.Add("X-Forwarded-Host");
+    logging.RequestHeaders.Add("X-Forwarded-Proto");
+    logging.RequestHeaders.Add("X-Forwarded-Port");
 
     logging.RequestBodyLogLimit = 4096;
     logging.ResponseBodyLogLimit = 4096;
@@ -85,7 +87,7 @@ using (var scope = app.Services.CreateScope())
 
     await DbSeeder.SeedUsersAsync(services);
 }
-app.UseHttpLogging();
+
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
 // {
@@ -95,7 +97,7 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/openapi/v1.json", "v1");
 });
 // }
-
+app.UseHttpLogging();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

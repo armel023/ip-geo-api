@@ -32,10 +32,9 @@ public class IpInfoService
 
     public async Task<IpInfoResponse?> GetIpInfoMeAsync()
     {
-        var ip = _httpContextAccessor.HttpContext?
-                .Request
-                .Headers["X-Forwarded-For"]
-                .FirstOrDefault();
+        var ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
+        var headers = _httpContextAccessor.HttpContext?.Request.Headers;
+        Console.WriteLine($"-->Headers: {headers}");
         Console.WriteLine($"-->Client IP: {ip}");
         var client = _clientFactory.CreateClient("IpInfo");
         // var request = new HttpRequestMessage(HttpMethod.Get, "/");
