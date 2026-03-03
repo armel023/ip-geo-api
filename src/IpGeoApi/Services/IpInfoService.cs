@@ -32,14 +32,19 @@ public class IpInfoService
 
     public async Task<IpInfoResponse?> GetIpInfoMeAsync()
     {
-        
+        var ip = _httpContextAccessor.HttpContext?
+                .Request
+                .Headers["X-Forwarded-For"]
+                .FirstOrDefault();
+        Console.WriteLine($"-->Client IP: {ip}");
         var client = _clientFactory.CreateClient("IpInfo");
-        var request = new HttpRequestMessage(HttpMethod.Get, "/");
+        // var request = new HttpRequestMessage(HttpMethod.Get, "/");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/{ip}");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-        request.Headers.Add("X-Forwarded-For", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
-        request.Headers.Add("X-Real-IP", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
-        request.Headers.Add("X-Client-IP", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
-        request.Headers.Add("X-Forwarded", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        // request.Headers.Add("X-Forwarded-For", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        // request.Headers.Add("X-Real-IP", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        // request.Headers.Add("X-Client-IP", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        // request.Headers.Add("X-Forwarded", _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
         
         var response = await client.SendAsync(request);
         if (!response.IsSuccessStatusCode)
