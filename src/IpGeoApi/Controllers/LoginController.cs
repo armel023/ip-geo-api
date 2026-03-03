@@ -1,23 +1,24 @@
 using IpGeoApi.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IpGeoApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthenticationController : ControllerBase
+    public class LoginController : ControllerBase
     {
-        private readonly AuthenticationService _authService;
+        private readonly AuthenticationService _authenticationService;
 
-        public AuthenticationController(AuthenticationService authService)
+        public LoginController(AuthenticationService authenticationService)
         {
-            _authService = authService;
+            _authenticationService = authenticationService;
         }
 
-        [HttpPost("login")]
+        [HttpPost]
         public async Task<IActionResult> Login([FromBody] DTOs.LoginRequest request)
         {
-            var result = await _authService.LoginAsync(request.Username, request.Password);
+            var result = await _authenticationService.LoginAsync(request.Username, request.Password);
             if (!result.Success || result.Data == null)
                 return Unauthorized(result.Error);
             return Ok(result.Data);
