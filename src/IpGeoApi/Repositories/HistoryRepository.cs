@@ -34,13 +34,22 @@ public class HistoryRepository : IHistoryRepository
     /// <returns></returns>
     public async Task<IEnumerable<History>> GetListAsync(string? ip, DateTime? from, DateTime? to, string? sortBy, bool desc, int skip, int take)
     {
+
         var query = _db.Histories.AsQueryable();
         if (!string.IsNullOrEmpty(ip))
             query = query.Where(h => h.Ip == ip);
         if (from.HasValue)
-            query = query.Where(h => h.CreatedAt >= from);
+        {
+            var fromUtc = DateTime.SpecifyKind(from.Value, DateTimeKind.Utc);
+            query = query.Where(h => h.CreatedAt >= fromUtc);
+        }
+
         if (to.HasValue)
-            query = query.Where(h => h.CreatedAt <= to);
+        {
+            // Move to next day at midnight
+            var toUtc = DateTime.SpecifyKind(to.Value.Date.AddDays(1), DateTimeKind.Utc);
+            query = query.Where(h => h.CreatedAt <= toUtc);
+        }
         if (!string.IsNullOrEmpty(sortBy))
         {
             if (sortBy.ToLower() == "ip")
@@ -66,9 +75,16 @@ public class HistoryRepository : IHistoryRepository
         if (!string.IsNullOrEmpty(ip))
             query = query.Where(h => h.Ip == ip);
         if (from.HasValue)
-            query = query.Where(h => h.CreatedAt >= from);
+        {
+            var fromUtc = DateTime.SpecifyKind(from.Value, DateTimeKind.Utc);
+            query = query.Where(h => h.CreatedAt >= fromUtc);
+        }
         if (to.HasValue)
-            query = query.Where(h => h.CreatedAt <= to);
+        {
+            // Move to next day at midnight
+            var toUtc = DateTime.SpecifyKind(to.Value.Date.AddDays(1), DateTimeKind.Utc);
+            query = query.Where(h => h.CreatedAt <= toUtc);
+        }
         return await query.CountAsync();
     }
 
