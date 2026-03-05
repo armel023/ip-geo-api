@@ -35,4 +35,14 @@ public class IpInfoController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMyIpInfo()
+    {
+        var result = await _ipInfoService.GetIpInfoMeAsync();
+        if (result == null)
+            return NotFound();
+
+        return Ok(result);
+    }
 }

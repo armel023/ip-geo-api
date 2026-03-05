@@ -27,4 +27,16 @@ public class IpInfoService
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<IpInfoResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
+
+    public async Task<IpInfoResponse?> GetIpInfoMeAsync()
+    {
+        var client = _clientFactory.CreateClient("IpInfo");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+        var response = await client.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+            return null;
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<IpInfoResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    }
 }

@@ -63,7 +63,12 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await IpGeoApi.Data.DbSeeder.SeedUsersAsync(services);
+    var db = services.GetRequiredService<AppDbContext>();
+
+    // Apply migrations
+    await db.Database.MigrateAsync();
+
+    await DbSeeder.SeedUsersAsync(services);
 }
 
 // Configure the HTTP request pipeline.

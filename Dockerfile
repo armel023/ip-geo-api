@@ -1,28 +1,29 @@
 # ==============================
 # Build Stage
 # ==============================
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
 # Copy csproj and restore dependencies
-COPY *.csproj ./
-RUN dotnet restore
+COPY IpGeoApi.slnx ./
+COPY src/IpGeoApi/IpGeoApi.csproj ./src/IpGeoApi/
+RUN dotnet restore ./src/IpGeoApi/IpGeoApi.csproj
 
 # Copy everything else and build
-COPY . ./
-RUN dotnet publish -c Release -o /out
+COPY . .
+RUN dotnet publish ./src/IpGeoApi/IpGeoApi.csproj -c Release -o /app/publish
 
 # ==============================
 # Runtime Stage
 # ==============================
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-# Copy published output
-COPY --from=build /out .
-
 # Expose port
-EXPOSE 8080
+EXPOSE 80
+
+# Copy published output
+COPY --from=build /app/publish .
 
 # Run application
-ENTRYPOINT ["dotnet", "IpGeo.Api.dll"]
+ENTRYPOINT ["dotnet", "IpGeoApi.dll"]
