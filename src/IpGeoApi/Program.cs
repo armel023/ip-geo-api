@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure HTTP logging
 builder.Services.AddHttpLogging(logging =>
 {
     logging.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestHeaders;
@@ -27,6 +28,7 @@ builder.Services.AddHttpLogging(logging =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Configure Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     {
         // User settings
@@ -44,7 +46,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
         options.Lockout.MaxFailedAccessAttempts = 5;
     })
     .AddEntityFrameworkStores<AppDbContext>();
-
+// Configure JWT authentication
 builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
     {
@@ -59,6 +61,7 @@ builder.Services.AddAuthentication()
         };
     });
 
+// Add services
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(IpGeoApi.Utilities.MappingProfile));
@@ -85,18 +88,21 @@ using (var scope = app.Services.CreateScope())
     // Apply migrations
     await db.Database.MigrateAsync();
 
+    // Seed users
     await DbSeeder.SeedUsersAsync(services);
 }
 
 // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-app.MapOpenApi();
-app.UseSwaggerUI(options =>
+if (app.Environment.IsDevelopment())
 {
-    options.SwaggerEndpoint("/openapi/v1.json", "v1");
-});
-// }
+    app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+    });
+}
+
+// Enable HTTP logging for all environments
 app.UseHttpLogging();
 app.UseHttpsRedirection();
 

@@ -1,5 +1,3 @@
-using IpGeoApi.Models;
-
 namespace IpGeoApi.DTOs;
 
 public class HistoryListResponse

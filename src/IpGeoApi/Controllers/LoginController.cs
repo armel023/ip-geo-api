@@ -1,5 +1,4 @@
 using IpGeoApi.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IpGeoApi.Controllers
